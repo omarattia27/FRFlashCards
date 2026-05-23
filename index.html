@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>FRFlashCards</title>
+  <title>French Vocabulary Flash Cards</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 2rem; max-width: 720px; }
     h1 { margin-bottom: 0.5rem; }
@@ -54,6 +54,7 @@
     const showAnswerButton = document.getElementById("show-answer");
     const nextButton = document.getElementById("next-card");
     const deleteButton = document.getElementById("delete-card");
+    const hiddenAnswerText = "Hidden";
 
     let cards = [];
     let currentIndex = 0;
@@ -68,20 +69,21 @@
     }
 
     function loadCards() {
+      let saved = [];
       try {
-        const saved = JSON.parse(localStorage.getItem(storageKey) || "[]");
-        cards = Array.isArray(saved)
-          ? saved.filter((card) =>
-            typeof card?.french === "string"
-            && typeof card?.english === "string"
-            && card.french.trim()
-            && card.english.trim()
-          )
-          : [];
+        saved = JSON.parse(localStorage.getItem(storageKey) || "[]");
       } catch (error) {
         console.warn("Unable to load flash cards from localStorage.", error);
-        cards = [];
       }
+
+      cards = Array.isArray(saved)
+        ? saved.filter((card) =>
+          typeof card?.french === "string"
+          && typeof card?.english === "string"
+          && card.french.trim()
+          && card.english.trim()
+        )
+        : [];
     }
 
     function render() {
@@ -98,7 +100,7 @@
 
       const card = cards[currentIndex];
       front.textContent = card.french;
-      back.textContent = showAnswer ? card.english : "Hidden";
+      back.textContent = showAnswer ? card.english : hiddenAnswerText;
       position.textContent = `${currentIndex + 1}/${cards.length}`;
     }
 
