@@ -33,7 +33,7 @@
 
   <section class="card" aria-live="polite">
     <p><strong>French:</strong> <span id="card-front">No cards yet.</span></p>
-    <p><strong>English:</strong> <span id="card-back">-</span></p>
+    <p><strong>English:</strong> <span id="card-back" aria-live="polite">-</span></p>
     <p class="muted">Card <span id="card-position">0/0</span></p>
   </section>
 
@@ -62,7 +62,8 @@
     function saveCards() {
       try {
         localStorage.setItem(storageKey, JSON.stringify(cards));
-      } catch {
+      } catch (error) {
+        console.warn("Unable to save flash cards to localStorage.", error);
       }
     }
 
@@ -77,7 +78,8 @@
             && card.english.trim()
           )
           : [];
-      } catch {
+      } catch (error) {
+        console.warn("Unable to load flash cards from localStorage.", error);
         cards = [];
       }
     }
