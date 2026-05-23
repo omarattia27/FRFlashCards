@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FRFlashCards</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; max-width: 720px; }
+    h1 { margin-bottom: 0.5rem; }
+    form { display: grid; gap: 0.75rem; margin-bottom: 1rem; }
+    .row { display: grid; gap: 0.5rem; }
+    input, button { padding: 0.6rem; font-size: 1rem; }
+    .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .card { border: 1px solid #ccc; border-radius: 8px; padding: 1rem; margin: 1rem 0; min-height: 110px; }
+    .muted { color: #666; }
+  </style>
+</head>
+<body>
+  <h1>FRFlashCards</h1>
+  <p class="muted">Build your own French vocabulary deck.</p>
+
+  <form id="add-card-form">
+    <div class="row">
+      <label for="french">French word/phrase</label>
+      <input id="french" name="french" required>
+    </div>
+    <div class="row">
+      <label for="english">English meaning</label>
+      <input id="english" name="english" required>
+    </div>
+    <button type="submit">Add card</button>
+  </form>
+
+  <section class="card" aria-live="polite">
+    <p><strong>French:</strong> <span id="card-front">No cards yet.</span></p>
+    <p><strong>English:</strong> <span id="card-back">-</span></p>
+    <p class="muted">Card <span id="card-position">0/0</span></p>
+  </section>
+
+  <div class="actions">
+    <button id="show-answer" type="button">Show answer</button>
+    <button id="next-card" type="button">Next</button>
+    <button id="delete-card" type="button">Delete current</button>
+  </div>
+
+  <script>
+    const storageKey = "frFlashCards";
+    const form = document.getElementById("add-card-form");
+    const frenchInput = document.getElementById("french");
+    const englishInput = document.getElementById("english");
+    const front = document.getElementById("card-front");
+    const back = document.getElementById("card-back");
+    const position = document.getElementById("card-position");
+    const showAnswerButton = document.getElementById("show-answer");
+    const nextButton = document.getElementById("next-card");
+    const deleteButton = document.getElementById("delete-card");
+
+    let cards = [];
+    let currentIndex = 0;
+    let showAnswer = false;
+
+    function saveCards() {
+      localStorage.setItem(storageKey, JSON.stringify(cards));
+    }
+
+    function loadCards() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(storageKey) || "[]");
+        cards = Array.isArray(saved) ? saved.filter((card) => card && card.french && card.english) : [];
+      } catch {
+        cards = [];
+      }
+    }
+
+    function render() {
+      if (!cards.length) {
+        front.textContent = "No cards yet.";
+        back.textContent = "-";
+        position.textContent = "0/0";
+        return;
+      }
+
+      if (currentIndex >= cards.length) {
+        currentIndex = 0;
+      }
+
+      const card = cards[currentIndex];
+      front.textContent = card.french;
+      back.textContent = showAnswer ? card.english : "•••";
+      position.textContent = `${currentIndex + 1}/${cards.length}`;
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const french = frenchInput.value.trim();
+      const english = englishInput.value.trim();
+
+      if (!french || !english) {
+        return;
+      }
+
+      cards.push({ french, english });
+      currentIndex = cards.length - 1;
+      showAnswer = false;
+      saveCards();
+      render();
+      form.reset();
+      frenchInput.focus();
+    });
+
+    showAnswerButton.addEventListener("click", () => {
+      if (!cards.length) {
+        return;
+      }
+      showAnswer = true;
+      render();
+    });
+
+    nextButton.addEventListener("click", () => {
+      if (!cards.length) {
+        return;
+      }
+      currentIndex = (currentIndex + 1) % cards.length;
+      showAnswer = false;
+      render();
+    });
+
+    deleteButton.addEventListener("click", () => {
+      if (!cards.length) {
+        return;
+      }
+      cards.splice(currentIndex, 1);
+      showAnswer = false;
+      saveCards();
+      render();
+    });
+
+    loadCards();
+    render();
+  </script>
+</body>
+</html>
