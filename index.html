@@ -60,13 +60,23 @@
     let showAnswer = false;
 
     function saveCards() {
-      localStorage.setItem(storageKey, JSON.stringify(cards));
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(cards));
+      } catch {
+      }
     }
 
     function loadCards() {
       try {
         const saved = JSON.parse(localStorage.getItem(storageKey) || "[]");
-        cards = Array.isArray(saved) ? saved.filter((card) => card && card.french && card.english) : [];
+        cards = Array.isArray(saved)
+          ? saved.filter((card) =>
+            typeof card?.french === "string"
+            && typeof card?.english === "string"
+            && card.french.trim()
+            && card.english.trim()
+          )
+          : [];
       } catch {
         cards = [];
       }
@@ -86,7 +96,7 @@
 
       const card = cards[currentIndex];
       front.textContent = card.french;
-      back.textContent = showAnswer ? card.english : "•••";
+      back.textContent = showAnswer ? card.english : "[Hidden - click Show answer]";
       position.textContent = `${currentIndex + 1}/${cards.length}`;
     }
 
