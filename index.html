@@ -87,7 +87,12 @@
     }
 
     function render() {
-      if (!cards.length) {
+      const hasCards = cards.length > 0;
+      showAnswerButton.disabled = !hasCards;
+      nextButton.disabled = !hasCards;
+      deleteButton.disabled = !hasCards;
+
+      if (!hasCards) {
         front.textContent = "No cards yet.";
         back.textContent = "-";
         position.textContent = "0/0";
