@@ -4,7 +4,7 @@ Simple browser-based French vocabulary flash cards where users control their own
 
 ## Usage
 
-1. Open `/home/runner/work/FRFlashCards/FRFlashCards/index.html` in a browser.
+1. Open `index.html` in a browser from your local clone.
 2. Add your own French/English flash cards.
 3. Use **Show answer**, **Next**, and **Delete current** to study.
 
